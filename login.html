@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<link type="text/css" href="css/style.css" rel="stylesheet" />
+<script type="text/javascript" src="js/jquery-1.7.min.js"></script>
+<title>登陆-一键开启小程序，知名小程序服务商，品牌的最佳选择</title>
+</head>
+
+<body>
+<!--登录start-->
+<div class="form_main">
+  <div class="login">
+    <img src="images/logo.jpg" alt="" class="logo_main" />
+    <ul class="tab">
+			<li><a href="javascript:void(0)" class="on">密码登录<i></i></a></li>
+			<!--<li><a href="javascript:void(0)">扫码登录<i></i></a></li>-->
+		</ul>
+		<ul class="con">
+			<li class="login_info"><input type="text" value="" placeholder="手机/邮箱" class="t_ico01" /></li>
+			<li class="login_info"><input type="password" value="" placeholder="密码" class="t_ico02" /></li>
+			<!--<li class="forget"><a href="##" target="_blank">忘记密码？</a></li> -->
+			<li class="btns"><input type="button" value="登    录" class="xlogin"/></li>
+			<li><p><a href="reg.html" target="_blank">注册</a></p></li>
+		</ul>
+	</div>
+</div>
+<!--登录end-->
+<script>
+    function login_test() {
+        var name = $('.t_ico01').val();
+        var password = $('.t_ico02').val();
+        $.ajax({
+            'type': 'post',
+            'url': '/users/login/',
+            data: {
+                name: name,
+                password: password,
+            },
+            success: function (res) {
+                    if (res['status'] == 0 || res['status'] == 301){
+                        window.location.href = res['msg'];
+                    }else{
+                        alert(res['msg']);
+                    }
+            }
+        }).done(function () {
+             $(".xlogin").removeAttr("disabled");
+        });
+    }
+
+    function check_login() {
+        $.get("/user/status/", function (res) {
+            if(res.data.login){
+                location = "/ismartcontent.html#!/"
+            }
+
+        })
+    }
+    $(document).ready(function () {
+        check_login();
+        setInterval(check_login, 3*1000);
+        $(".xlogin").click(function () {
+            $(this).attr("disabled","disabled");
+            login_test();
+        });
+
+        $(document).keyup(function(e){
+            if(e.keyCode==13){
+                $(".xlogin").attr("disabled","disabled");
+                login_test();
+            }
+         });
+    })
+</script>
+
+</body>
+</html>

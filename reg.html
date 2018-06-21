@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <link type="text/css" href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript" src="js/jquery-1.7.min.js"></script>
+    <title>注册-一键开启小程序，知名小程序服务商，品牌的最佳选择</title>
+</head>
+
+<body>
+<!--注册start-->
+<div class="form_main">
+    <div class="resiger">
+        <img src="images/logo.jpg" class="logo_main"/>
+        <ul class="step">
+            <li class="fl on"><i>1</i>注册账号</li>
+            <li class="fl"><img src="images/img_22.jpg" alt=""/></li>
+            <li class="fl"><i>2</i>授权小程序</li>
+            <li class="fl"><img src="images/img_22.jpg" alt=""/></li>
+            <li class="fr"><i>3</i>开始使用</li>
+        </ul>
+        <ul class="con">
+            <li class="type_info">
+                <input type="text" readonly value="+86" class="type"/>
+                <input type="text" value="" placeholder="输入手机号" class="type_text mobile"/>
+                <div>
+                    <p>+86</p>
+                    <!--<p>+186</p>-->
+                </div>
+            </li>
+            <li class="type_info">
+                <input type="text" readonly value="短信验证" class="type"/>
+                <input type="text" value="" placeholder="输入验证码" class="type_text sms_code"/>
+                <a href="javascript:void(0)" class="get_auth">获取验证码</a>
+                <a href="javascript:void(0)" style="display: none" class="reset"><span class="second">60</span>秒后重发</a>
+                <div>
+                    <p>短信验证</p>
+                    <!--<p>邮箱验证</p>-->
+                </div>
+            </li>
+            <li class="login_info resiger_info"><input type="password" value="" placeholder="请输入6位及以上的密码"
+                                                       class="password"/></li>
+            <li class="login_info resiger_info"><input type="password" value="" placeholder="再次输入确认"
+                                                       class="repeat_password"/></li>
+            <li class="btns"><input type="button" value="创建账号" class="reg"/></li>
+            <li><p>已有账号？<a href="login.html" target="_blank">点击登录</a></p></li>
+        </ul>
+    </div>
+</div>
+<!--注册end-->
+<script>
+    function resetCode() {
+        $('.get_auth').hide();
+        $('.second').html('60');
+        $('.reset').show();
+        var second = 60;
+        var timer = null;
+        timer = setInterval(function () {
+            second -= 1;
+            if (second > 0) {
+                $('.second').html(second);
+            } else {
+                clearInterval(timer);
+                $('.get_auth').show();
+                $('.reset').hide();
+            }
+        }, 1000);
+    }
+    function check_login() {
+        $.get("/user/status/", function (res) {
+            if(res.data.login){
+                location = "/ismartcontent.html#!/"
+            }
+
+        })
+    }
+    $(document).ready(function () {
+        check_login();
+        setInterval(check_login, 3*1000);
+        $(".type").on('click', function (e) {
+            $(".type_info div").hide();
+            $(this).nextAll("div").toggle();
+            e.stopPropagation();
+        });
+        $(document).click(function () {
+            $(".type_info div").hide();
+        });
+        $(".type_info div p").on('click', function () {
+            $(this).parents(".type_info").find(".type").val($(this).html());
+            $(this).parents(".type_info div").hide();
+        });
+        $(".get_auth").click(function () {
+            var mobile = $(".mobile").val();
+            resetCode();
+            $.ajax({
+                'type': 'post',
+                'url': '/user/sendsms/',
+                data: {
+                    mobile: mobile
+                },
+                success: function (res) {
+                    alert(res['msg']);
+                }
+            });
+        });
+        $(".reg").click(function () {
+            var name = $(".mobile").val();
+            var password = $(".password").val();
+            var repeat_password = $(".repeat_password").val();
+            var sms_code = $(".sms_code").val();
+            if (!password) {
+                alert("请输入密码");
+            }
+            if (password != repeat_password) {
+                alert("两个密码不一致");
+            }
+            $.ajax({
+                'type': 'post',
+                'url': '/users/reg/',
+                data: {
+                    name: name,
+                    password: password,
+                    sms_code: sms_code
+                },
+                success: function (res) {
+                    msg = res["msg"];
+                    if (res["status"] == 0) {
+                        location.href = msg
+                    } else {
+                        alert(msg);
+                    }
+
+                }
+            });
+        })
+    })
+
+
+</script>
+</body>
+</html>
